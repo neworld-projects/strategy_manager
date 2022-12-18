@@ -40,6 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # local apps
+    'strategy',
+
+    # third party
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -91,6 +97,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+RABBIT_HOST = config('RABBIT_HOST', default='localhost')
+RABBIT_PORT = config('RABBIT_PORT', default='5672')
+RABBIT_USERNAME = config('RABBIT_USERNAME', default='')
+RABBIT_PASSWORD = config('RABBIT_PASSWORD', default='')
+
+CELERY_BROKER_URL = f'amqp://{RABBIT_USERNAME}:{RABBIT_PASSWORD}@{RABBIT_HOST}:{RABBIT_PORT}'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# task names
+TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
