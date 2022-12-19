@@ -1,8 +1,8 @@
 import _thread
 from time import sleep
 
-from utils.tradingview.core.base_socket import OpenWebsocketConnection
-from utils.tradingview.core.configs import resolve_sample_chart
+from services.tradingview.core.base_socket import OpenWebsocketConnection
+from services.tradingview.core.configs import resolve_sample_chart
 
 
 class WebSocketConnectionSampleChart(OpenWebsocketConnection):

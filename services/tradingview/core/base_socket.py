@@ -7,7 +7,7 @@ import websocket
 from django.conf import settings
 
 from strategy.enums import TimeframeChoice
-from utils.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series
+from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series
 
 logging.DEBUG = False
 
