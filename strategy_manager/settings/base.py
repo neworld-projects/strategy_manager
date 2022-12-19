@@ -108,6 +108,11 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # task names
 TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'
 
+# websocket configs
+TRADINGVIEW_WEBSOCKET_URL = config("TRADINGVIEW_WEBSOCKET_URL", default='')
+CS_TOKEN = config('CS_TOKEN', default='')
+QS_TOKEN = config('QS_TOKEN', default='')
+AUTH_TOKEN = config('AUTH_TOKEN', default='')
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 

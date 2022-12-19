@@ -13,6 +13,15 @@ class TimeInterval(models.TextChoices):
     DAILY = 'one_day', _('1 day')
 
     @classmethod
+    def get_second(cls, interval):
+        if (
+                interval == cls.ONE_MIN or
+                interval == cls.FIVE_MIN
+        ):
+            return 55
+        return None
+
+    @classmethod
     def get_minute(cls, interval):
         if (
                 interval == cls.ONE_HOUR or
@@ -21,7 +30,7 @@ class TimeInterval(models.TextChoices):
                 interval == cls.FOUR_HOUR or
                 interval == cls.DAILY
         ):
-            return 0
+            return 55
         return None
 
     @classmethod
@@ -29,7 +38,7 @@ class TimeInterval(models.TextChoices):
         if (
                 interval == cls.DAILY
         ):
-            return 0
+            return 23
         return None
 
     @classmethod
@@ -54,3 +63,15 @@ class TimeInterval(models.TextChoices):
 
         if cls.DAILY == interval:
             return IntervalSchedule.objects.get_or_create(every=1, period='days')
+
+
+class TimeframeChoice(models.IntegerChoices):
+    FIVE_MINUTES = 0, '{"name": "5", "timestamp": 300}'
+    FIFTEEN_MINUTES = 1, '{"name": "15", "timestamp": 4500}'
+    THIRTY_MINUTES = 2, '{"name": "30", "timestamp": 1800}'
+    SIXTY_MINUTES = 3, '{"name": "60", "timestamp": 3600}'
+    TOW_HOURS = 4, '{"name": "120", "timestamp": 7200}'
+    THREE_HOURS = 5, '{"name": "180", "timestamp": 10800}'
+    FOUR_HOURS = 6, '{"name": "240", "timestamp": 14400}'
+    ONE_DAY = 7, '{"name": "1D", "timestamp": 86400}'
+    ONE_WEEK = 8, '{"name": "1W", "timestamp": 604800}'
