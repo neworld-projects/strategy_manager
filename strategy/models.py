@@ -32,6 +32,5 @@ class TradingViewStrategy(models.Model):
                 hour=TimeInterval.get_hour(self.running_interval),
                 second=TimeInterval.get_second(self.running_interval),
                 microsecond=0
-            ),
-            expire_seconds=timezone.timedelta(minutes=10)
+            )
         )

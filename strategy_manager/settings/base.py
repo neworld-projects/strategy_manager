@@ -104,6 +104,7 @@ RABBIT_PASSWORD = config('RABBIT_PASSWORD', default='')
 
 CELERY_BROKER_URL = f'amqp://{RABBIT_USERNAME}:{RABBIT_PASSWORD}@{RABBIT_HOST}:{RABBIT_PORT}'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+SHARED_TASK_TIME_LIMIT = config('SHARED_TASK_TIME_LIMIT', default=10, cast=int)
 
 # task names
 TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'
