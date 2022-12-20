@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 
 headers = {
@@ -37,9 +39,27 @@ def create_series(timeframe: str, length: int):
         request_number = 81
     else:
         request_number = 82
-    return '~m~' + str(request_number) + '~m~{"m":"create_series","p":["' + settings.CS_TOKEN + '","sds_1","s1","sds_sym_1","' + \
+    return '~m~' + str(
+        request_number) + '~m~{"m":"create_series","p":["' + settings.CS_TOKEN + '","sds_1","s1","sds_sym_1","' + \
            str(timeframe) + '",' + str(length) + ',""]}'
 
 
 def more_data(length: int):
     return '~m~62~m~{"m":"request_more_data","p":["' + settings.CS_TOKEN + '","sds_1",' + str(length) + ']}'
+
+
+def get_strategy_str(strategy_settings: dict):
+    setting_dictionary = [
+        {
+            'm': 'create_study',
+            'p': [
+                settings.CS_TOKEN,
+                'st7',
+                'st1',
+                'sds_1',
+                'StrategyScript@tv-scripting-101!',
+                strategy_settings
+            ]
+        }
+    ]
+    return f'~m~6135~m~{json.dumps(setting_dictionary)}'

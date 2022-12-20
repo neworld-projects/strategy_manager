@@ -42,6 +42,21 @@ class TimeInterval(models.TextChoices):
         return None
 
     @classmethod
+    def get_replace_args(cls, interval):
+        minute = cls.get_minute(interval)
+        hour = cls.get_hour(interval)
+        second = cls.get_second(interval)
+
+        result = {'microsecond': 0}
+        if minute:
+            result['minute'] = minute
+        if hour:
+            result['hour'] = hour
+        if second:
+            result['second'] = second
+        return result
+
+    @classmethod
     def convert_to_interval_model(cls, interval):
         if cls.ONE_MIN == interval:
             return IntervalSchedule.objects.get_or_create(every=1, period='minutes')

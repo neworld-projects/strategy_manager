@@ -15,7 +15,7 @@ logging.DEBUG = False
 class OpenWebsocketConnection:
     def __init__(self, symbol: str, timeframe: str):
         self.timeframe = timeframe
-        self.timeframe_for_send = loads(TimeframeChoice[self.timeframe].label)
+        self.timeframe_for_send = loads(self.timeframe)
         self.symbol = symbol
         self.tradingview_websocket_url = settings.TRADINGVIEW_WEBSOCKET_URL
         websocket.enableTrace(True)
@@ -33,7 +33,8 @@ class OpenWebsocketConnection:
             return None
         else:
             split_message = re.split("~m~[0-9]+~m~", message)
-            list_json_message = [loads(split_message[convert]) for convert in range(1, len(split_message))]
+            print(split_message)
+            list_json_message = [loads(convert) for convert in split_message[1:]]
             return list_json_message
 
     def on_error(self, ws, error):

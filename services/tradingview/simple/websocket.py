@@ -2,14 +2,16 @@ import _thread
 from time import sleep
 
 from services.tradingview.core.base_socket import OpenWebsocketConnection
-from services.tradingview.core.configs import resolve_sample_chart
+from services.tradingview.core.configs import resolve_sample_chart, get_strategy_str
+from strategy.models import TradingViewStrategy
 
 
 class WebSocketConnectionSampleChart(OpenWebsocketConnection):
 
-    def __init__(self, symbol: str, timeframe: str, strategy_settings: str):
-        super(WebSocketConnectionSampleChart, self).__init__(symbol, timeframe)
-        self.strategy_settings = strategy_settings
+    def __init__(self, instance: TradingViewStrategy):
+        self.instance = instance
+        super(WebSocketConnectionSampleChart, self).__init__(self.instance.symbol, self.instance.get_timeframe_display())
+        self.strategy_settings = get_strategy_str(self.instance.settings)
         self.ws_app.run_forever()
 
     def on_open(self, ws):
@@ -27,5 +29,12 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
         result = super(WebSocketConnectionSampleChart, self).on_message(ws, message)
         if result is None:
             return result
-        print(result)
+        if result['m'] == 'du':
+            strategy_values = result['m'][1].get('st7')
+            if strategy_values:
+                date_time = strategy_values[0]
+                open_price = strategy_values[1]
+                tps = strategy_values[2:-1]
+                stop_lost = strategy_values[-1]
+                print(date_time, open_price, tps, stop_lost, sep=" -- ")
         return result

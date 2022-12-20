@@ -12,5 +12,5 @@ from strategy.models import TradingViewStrategy
     time_limit=datetime.timedelta(minutes=settings.SHARED_TASK_TIME_LIMIT)
 )
 def check_tradingview_strategy(instance_id: int):
-    instance = TradingViewStrategy.objects.get(id=instance_id)
-    WebSocketConnectionSampleChart(instance.symbol, instance.timeframe, instance.settings)
+    instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
+    WebSocketConnectionSampleChart(instance)
