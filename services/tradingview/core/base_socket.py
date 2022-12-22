@@ -7,7 +7,7 @@ import websocket
 from django.conf import settings
 
 from strategy.enums import TimeframeChoice
-from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series
+from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series, switch_timezone
 
 logging.DEBUG = False
 
@@ -33,8 +33,12 @@ class OpenWebsocketConnection:
             return None
         else:
             split_message = re.split("~m~[0-9]+~m~", message)
-            print(split_message)
-            list_json_message = [loads(convert) for convert in split_message[1:]]
+            list_json_message = []
+            for convert in split_message[1:]:
+                try:
+                    list_json_message.append(loads(convert))
+                except Exception as e:
+                    pass
             return list_json_message
 
     def on_error(self, ws, error):
@@ -49,6 +53,8 @@ class OpenWebsocketConnection:
 
             ws.send(chart_session)
 
+            ws.send(switch_timezone)
+
             ws.send(quote_session)
 
             ws.send(add_symbols(self.symbol))
@@ -56,4 +62,4 @@ class OpenWebsocketConnection:
         _thread.start_new_thread(run, ())
 
     def continue_opening(self, ws):
-        ws.send(create_series(self.timeframe_for_send['name'], 500))
+        ws.send(create_series(self.timeframe_for_send['name'], 300))

@@ -114,6 +114,8 @@ TRADINGVIEW_WEBSOCKET_URL = config("TRADINGVIEW_WEBSOCKET_URL", default='')
 CS_TOKEN = config('CS_TOKEN', default='')
 QS_TOKEN = config('QS_TOKEN', default='')
 AUTH_TOKEN = config('AUTH_TOKEN', default='')
+TRADINGVIEW_USERNAME = config('TRADINGVIEW_USERNAME', default='lirezazadeh77')
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 

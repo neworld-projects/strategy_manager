@@ -90,3 +90,8 @@ class TimeframeChoice(models.IntegerChoices):
     FOUR_HOURS = 6, '{"name": "240", "timestamp": 14400}'
     ONE_DAY = 7, '{"name": "1D", "timestamp": 86400}'
     ONE_WEEK = 8, '{"name": "1W", "timestamp": 604800}'
+
+
+class TradingViewScriptModeChoice(models.TextChoices):
+    STRATEGY = 'strategy', _('strategy')
+    INDICATOR = 'indicator', _('indicator')
