@@ -13,6 +13,7 @@ if [[ $(cat /etc/hostname) == third-party-manager ]]; then
    /usr/local/bin/celery -A strategy_manager worker -l info -Q third_party_manager --concurrency=1 -n third_party_manager@neworld
 fi
 if [[ $(cat /etc/hostname) == app ]]; then
+      python manage.py migrate
       mkdir /tmp/prom_metrics_uwsgi/najva/uwsgi
       /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi/app.ini
 fi
