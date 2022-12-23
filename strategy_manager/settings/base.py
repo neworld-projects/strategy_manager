@@ -108,6 +108,7 @@ SHARED_TASK_TIME_LIMIT = config('SHARED_TASK_TIME_LIMIT', default=10, cast=int)
 
 # task names
 TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'
+THIRD_PARTY_MANAGER_TASK = 'third_party_manager'
 
 # websocket configs
 TRADINGVIEW_WEBSOCKET_URL = config("TRADINGVIEW_WEBSOCKET_URL", default='')

@@ -3,7 +3,7 @@ from time import sleep
 
 from django.conf import settings
 
-from helpers.send_to_third_party import third_party_manager
+from strategy.tasks.third_party import third_party_manager
 from services.tradingview.core.base_socket import OpenWebsocketConnection
 from services.tradingview.core.configs import resolve_sample_chart, get_strategy_str
 from strategy.DTOs import StateInformation, TpsValue, TelegramOpenPositionMessageBuilder
@@ -55,11 +55,11 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
                             third_party_manager.apply_async(
                                 args=(
                                     TelegramOpenPositionMessageBuilder(self.last_state, current_state).__dict__,
-                                    settings.TELEGRAM_MODULE,
-                                    True
+                                    settings.TELEGRAM_MODULE
                                 ),
                                 kwargs={'chat_id': self.instance.telegram_id}
                             )
+                            # TODO: send to broker
                             # print(date_time, open_price, tps, stop_lost, sep=" -- ")
                         self.last_state = current_state
 

@@ -1,7 +1,3 @@
-import logging
-
-from celery import shared_task
-
 from services.telegram.send_message import send_message
 
 
@@ -25,18 +21,9 @@ def convert_dict_to_str(message: dict, message_mode: str) -> str:
     return str_message
 
 
-@shared_task
-def third_party_manager(message: dict, target: str, requeue=False, message_mode='html', *args, **kwargs) -> None:
+def third_party_call(message: dict, target: str, message_mode: str = 'html', *args, **kwargs) -> None:
     str_message = convert_dict_to_str(message, message_mode)
-    try:
-        globals()[target](str_message, **kwargs)
-    except Exception as e:
-        logging.error(e)
-        if requeue:
-            third_party_manager.apply_async(
-                args=(message, target, False, message_mode),
-                kwargs=kwargs
-            )
+    globals()[target](str_message, **kwargs)
 
 
 def telegram_sender(message: str, *args, **kwargs) -> None:

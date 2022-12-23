@@ -21,17 +21,15 @@ class StateInformation:
 
 @dataclass
 class TelegramOpenPositionMessageBuilder:
-    datetime_timestamp: datetime
+    datetime_timestamp: str
     open_position_value: float
     tps_value: TpsValue
     close_position_value: float
     position_mode: str
 
     def __init__(self, last_state: StateInformation, current_state: StateInformation):
-        self.datetime_timestamp = datetime.utcfromtimestamp(current_state.datetime_timestamp)
+        self.datetime_timestamp = datetime.utcfromtimestamp(current_state.datetime_timestamp).__str__()
         self.open_position_value = last_state.open_position_value
         self.tps_value = last_state.tps_value
         self.close_position_value = last_state.close_position_value
         self.position_mode = "long" if last_state.close_position_value > last_state.open_position_value else "short"
-
-# TelegramOpenPositionMessageBuilder(StateInformation(41646, 131,[200,300,400],500), StateInformation(4146646, 0,[0,0,0],0))

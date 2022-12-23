@@ -14,3 +14,4 @@ from strategy.models import TradingViewStrategy
 def check_tradingview_strategy(instance_id: int):
     instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
     WebSocketConnectionSampleChart(instance)
+

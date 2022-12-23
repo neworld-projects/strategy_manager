@@ -13,5 +13,8 @@ app.autodiscover_tasks()
 app.conf.task_routes = {
     settings.TRADINGVIEW_STRATEGY_CHECK_TASK: {
         'queue': 'tradingview_strategy_check'
+    },
+    settings.THIRD_PARTY_MANAGER_TASK: {
+        'queue': 'tradingview_strategy_check'
     }
 }
