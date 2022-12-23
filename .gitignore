@@ -4,3 +4,6 @@ venv
 .env
 database_storage
 prod.env
+db_data
+data
+pgadmin4

@@ -48,7 +48,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/sdc/rabbitmq
+      device: /opt/rabbitmq
       o: bind
 
 networks:
