@@ -1,0 +1,13 @@
+.git/
+.idea/
+jwt_keys/
+.idea/
+__pycache__
+*__pycache__*
+*.sqlite3
+*.coverage
+celerybeat-schedule
+celerybeat.pid
+uwsgi.ini
+.env
+

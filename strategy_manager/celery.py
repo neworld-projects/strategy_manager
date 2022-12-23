@@ -15,6 +15,6 @@ app.conf.task_routes = {
         'queue': 'tradingview_strategy_check'
     },
     settings.THIRD_PARTY_MANAGER_TASK: {
-        'queue': 'tradingview_strategy_check'
+        'queue': 'third_party_manager'
     }
 }

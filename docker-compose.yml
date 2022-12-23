@@ -1,0 +1,75 @@
+version: "3.9"
+
+x-container-config:
+  &configs
+  image: strategy-manager:latest
+  volumes:
+    - ./prod.env:/usr/src/app/.env
+  restart: always
+  networks:
+    - strategy_manager_net
+    - services_handler_net
+
+services:
+  app:
+    <<: *configs
+    build: .
+    hostname: app
+    ports:
+      - '8070:49152'
+    sysctls:
+      - net.core.somaxconn=240536
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2G"
+
+  celery:
+    <<: *configs
+    build: .
+    hostname: celery
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2G"
+
+  celery-beat:
+    <<: *configs
+    build: .
+    hostname: celery-beat
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2G"
+
+  tradingview-strategy-check:
+    <<: *configs
+    build: .
+    hostname: tradingview-strategy-check
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2G"
+    scale: 10
+
+  third-party-manager:
+    <<: *configs
+    build: .
+    hostname: third-party-manager
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2G"
+
+networks:
+  strategy_manager_net:
+    external: true
+
+  services_handler_net:
+    external: true
+
