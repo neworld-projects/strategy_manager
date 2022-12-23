@@ -20,6 +20,7 @@ services:
   postgres_db:
     image: postgres
     restart: always
+    container_name: postgres_db
     environment:
       POSTGRES_PASSWORD: "JPmb@3q1b31mV21FmCx"
     ports:
