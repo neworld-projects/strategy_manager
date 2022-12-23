@@ -102,7 +102,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'base': {
-            'format': '{levelname} : {asctime}  module={module} precess={process}  thread={thread}  msg={message}  info={info}',
+            'format': '{levelname}: {asctime}  module={module} filename={filename} pathname={pathname} lineno={lineno} precess={process}  thread={thread} threadName={threadName}  msg={message} info={info}',
             'style': '{'
         },
     },
