@@ -19,3 +19,5 @@ class TradingViewStrategy(models.Model):
         default=TradingViewScriptModeChoice.INDICATOR,
         max_length=20
     )
+    telegram_id = models.CharField(max_length=20)
+    broker_is_active = models.BooleanField(default=False)

@@ -105,5 +105,3 @@ def get_strategy_str(pine_id, pine_version, script_mode):
     }
     data = f'~m~2606~m~{json.dumps(setting_dictionary)}'.replace(" ", '')
     return data
-
-# 4697

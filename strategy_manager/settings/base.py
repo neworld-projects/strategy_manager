@@ -116,6 +116,10 @@ QS_TOKEN = config('QS_TOKEN', default='')
 AUTH_TOKEN = config('AUTH_TOKEN', default='')
 TRADINGVIEW_USERNAME = config('TRADINGVIEW_USERNAME', default='lirezazadeh77')
 
+# telegram config
+TELEGRAM_TOKEN = config('TELEGRAM_TOKEN', default="")
+TELEGRAM_MODULE = config('TELEGRAM_MODULE', default='telegram_sender')
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
