@@ -14,6 +14,5 @@ if [[ $(cat /etc/hostname) == third-party-manager ]]; then
 fi
 if [[ $(cat /etc/hostname) == app ]]; then
       python manage.py migrate
-      mkdir /tmp/prom_metrics_uwsgi/najva/uwsgi
       /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi/app.ini
 fi
