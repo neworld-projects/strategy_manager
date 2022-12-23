@@ -6,8 +6,8 @@ from json import loads
 import websocket
 from django.conf import settings
 
-from strategy.enums import TimeframeChoice
-from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series, switch_timezone
+from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series, \
+    switch_timezone
 
 logging.DEBUG = False
 
@@ -38,14 +38,14 @@ class OpenWebsocketConnection:
                 try:
                     list_json_message.append(loads(convert))
                 except Exception as e:
-                    pass
+                    logging.error(e)
             return list_json_message
 
     def on_error(self, ws, error):
-        print("error:", error, self.timeframe)
+        logging.error(error, extra={'info': {"timeframe": self.timeframe}})
 
     def on_close(self, ws, close_status_code, close_msg):
-        print(f"### closed {self.timeframe}###")
+        logging.warning('close', extra={'info': {"timeframe": self.timeframe}})
 
     def on_open(self, ws):
         def run(*args):

@@ -1,13 +1,14 @@
 import _thread
+import logging
 from time import sleep
 
 from django.conf import settings
 
-from strategy.tasks.third_party import third_party_manager
 from services.tradingview.core.base_socket import OpenWebsocketConnection
 from services.tradingview.core.configs import resolve_sample_chart, get_strategy_str
 from strategy.DTOs import StateInformation, TpsValue, TelegramOpenPositionMessageBuilder
 from strategy.models import TradingViewStrategy
+from strategy.tasks.third_party import third_party_manager
 
 
 class WebSocketConnectionSampleChart(OpenWebsocketConnection):
@@ -34,6 +35,17 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
 
         _thread.start_new_thread(self_setting, ())
 
+    def send_position_data(self, position_data: TelegramOpenPositionMessageBuilder):
+        position_data = position_data.__dict__
+        logging.info("open position data", extra={'info': position_data})
+        third_party_manager.apply_async(
+            args=(position_data, settings.TELEGRAM_MODULE),
+            kwargs={'chat_id': self.instance.telegram_id}
+        )
+        if self.instance.broker_is_active:
+            # TODO: send to broker
+            pass
+
     def on_message(self, ws, message):
         try:
             results = super(WebSocketConnectionSampleChart, self).on_message(ws, message)
@@ -52,17 +64,9 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
                         )
                         if 0 < self.last_state.datetime_timestamp != current_state.datetime_timestamp \
                                 and self.last_state.open_position_value != 0:
-                            third_party_manager.apply_async(
-                                args=(
-                                    TelegramOpenPositionMessageBuilder(self.last_state, current_state).__dict__,
-                                    settings.TELEGRAM_MODULE
-                                ),
-                                kwargs={'chat_id': self.instance.telegram_id}
-                            )
-                            # TODO: send to broker
-                            # print(date_time, open_price, tps, stop_lost, sep=" -- ")
+                            position_data = TelegramOpenPositionMessageBuilder(self.last_state, current_state)
+                            self.send_position_data(position_data)
                         self.last_state = current_state
 
         except Exception as e:
-            pass
-        return result
+            logging.error(e)

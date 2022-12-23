@@ -97,6 +97,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'base': {
+            'format': '{levelname} : {asctime}  module={module} precess={process}  thread={thread}  msg={message}  info={info}',
+            'style': '{'
+        },
+    },
+    'filters': {
+        'system_log_filter': {
+            '()': 'helpers.logger_handler.SystemLogFilter',
+         },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['system_log_filter'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'base',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'propagate': True,
+        },
+    }
+}
+
 RABBIT_HOST = config('RABBIT_HOST', default='localhost')
 RABBIT_PORT = config('RABBIT_PORT', default='5672')
 RABBIT_USERNAME = config('RABBIT_USERNAME', default='')
