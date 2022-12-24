@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $(cat /etc/hostname) == celery ]]; then
-    /usr/local/bin/celery -A strategy_manager worker -l info -Q celery --concurrency=1 -n celery@najva
+    /usr/local/bin/celery -A strategy_manager worker -l info -Q celery --concurrency=1 -n celery@neworld
 fi
 if [[ $(cat /etc/hostname) == celery-beat ]]; then
    /usr/local/bin/celery -A strategy_manager beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
