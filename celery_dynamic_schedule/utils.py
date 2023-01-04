@@ -16,4 +16,4 @@ def active_tasks():
         }
     )
     for active_task in active_tasks_for_run:
-        app.send_task(active_task.task, kwargs=active_task.task_kwargs)
+        app.send_task(active_task.task, args=active_task.task_args)

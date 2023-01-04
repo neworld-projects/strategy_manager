@@ -7,7 +7,7 @@ class CeleryDynamicSchedule(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=150)
     task = models.CharField(max_length=150)
-    task_kwargs = models.JSONField(default=dict)
+    task_args = models.JSONField(default=dict)
     last_run = models.DateTimeField(null=True, blank=True)
     crontab_code = models.CharField(max_length=150)
     run_crontab_minute = models.JSONField(default=dict)
