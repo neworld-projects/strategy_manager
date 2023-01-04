@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import ChainMap
 
 import requests
@@ -104,4 +105,5 @@ def get_strategy_str(pine_id, pine_version, script_mode):
         ]
     }
     data = f'~m~2606~m~{json.dumps(setting_dictionary)}'.replace(" ", '')
+    logging.info(f"ready message for send {data}")
     return data
