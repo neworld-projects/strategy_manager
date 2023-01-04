@@ -25,10 +25,10 @@ services:
           cpus: "1"
           memory: "2G"
 
-  celery:
+  celery-dynamic-schedule:
     <<: *configs
     build: .
-    hostname: celery
+    hostname: celery-dynamic-schedule
     deploy:
       resources:
         limits:

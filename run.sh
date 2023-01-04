@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ $(cat /etc/hostname) == celery ]]; then
+if [[ $(cat /etc/hostname) == celery-dynamic-schedule ]]; then
     /usr/local/bin/celery -A strategy_manager worker -l info -Q celery_dynamic_schedule --concurrency=1 -n celery@neworld
 fi
 if [[ $(cat /etc/hostname) == celery-beat ]]; then
