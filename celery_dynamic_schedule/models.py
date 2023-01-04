@@ -5,7 +5,7 @@ from django.db import models
 class CeleryDynamicSchedule(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
     task = models.CharField(max_length=150)
     task_kwargs = models.JSONField(default=dict)
     last_run = models.DateTimeField(null=True, blank=True)
