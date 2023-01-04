@@ -13,7 +13,7 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'check celery dynamic schedule': {
-        'task': 'celery_dynamic_schedule.task.check_tasks_for_run',
+        'task': 'celery_dynamic_schedule.tasks.check_tasks_for_run',
         'options': {'queue': 'celery_dynamic_schedule'},
         'schedule': crontab('*')
     },
