@@ -53,7 +53,6 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
             if results is None:
                 return results
             for result in results:
-                logging.info(result)
                 if result['m'] == 'du':
                     strategy_values = result['p'][1].get('st7')
                     if strategy_values:
