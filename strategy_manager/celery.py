@@ -13,11 +13,11 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'check celery dynamic schedule': {
-        'celery_dynamic_schedule.task.check_tasks_for_run': {
-            'queue': 'celery_dynamic_schedule',
-            'schedule': crontab('*')
-        },
-    }
+        'task': 'celery_dynamic_schedule.task.check_tasks_for_run',
+        'options': {'queue': 'celery_dynamic_schedule'},
+        'schedule': crontab('*')
+    },
+
 }
 app.conf.task_routes = {
     settings.TRADINGVIEW_STRATEGY_CHECK_TASK: {
