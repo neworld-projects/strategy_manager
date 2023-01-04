@@ -12,8 +12,8 @@ from strategy.models import TradingViewStrategy
     name=settings.TRADINGVIEW_STRATEGY_CHECK_TASK,
     time_limit=datetime.timedelta(minutes=settings.SHARED_TASK_TIME_LIMIT).seconds
 )
-def check_tradingview_strategy(instance_id: int):
-    logging.info(f"tobe start instance: {instance_id}")
-    instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
+def check_tradingview_strategy(*args, **kwargs):
+    logging.info(f"tobe start instance: {kwargs['instance_id']}")
+    instance = TradingViewStrategy.objects.get(id=kwargs['instance_id'], is_active=True)
     WebSocketConnectionSampleChart(instance)
 
