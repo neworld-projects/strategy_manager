@@ -27,8 +27,8 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./opt/data:/var/
-      - ./opt/db_data:/var/lib/postgresql/data
+      - ./opt/postgres/data:/var/
+      - ./opt/postgres/db_data:/var/lib/postgresql/data
     networks:
       - services_handler_net
 
