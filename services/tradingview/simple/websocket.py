@@ -27,6 +27,7 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
     def on_open(self, ws):
         super(WebSocketConnectionSampleChart, self).on_open(ws)
         sleep(10)
+        logging.info("channel was opened")
 
         def self_setting():
             ws.send(resolve_sample_chart(self.symbol))
