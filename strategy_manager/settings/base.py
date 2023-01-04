@@ -43,9 +43,8 @@ INSTALLED_APPS = [
 
     # local apps
     'strategy',
+    'celery_dynamic_schedule',
 
-    # third party
-    'django_celery_beat',
 ]
 
 MIDDLEWARE = [

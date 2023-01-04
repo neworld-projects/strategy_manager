@@ -1,24 +1,22 @@
 import json
+import uuid
 
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
-from django_celery_beat.models import PeriodicTask
 
-from strategy.enums import TimeInterval
+from celery_dynamic_schedule.models import CeleryDynamicSchedule
 from strategy.models import TradingViewStrategy
 
 
 @receiver(post_save, sender=TradingViewStrategy)
-def create_periodic_task(sender, instance, **kwargs):
-    PeriodicTask.objects.get_or_create(
-        name=instance.name,
+def create_periodic_task(sender, instance: TradingViewStrategy, **kwargs):
+    CeleryDynamicSchedule.objects.get_or_create(
+        name=f'{instance.name}-{uuid.uuid4()}',
         defaults={
-            "name": instance.name,
+            "name": f'{instance.name}-{uuid.uuid4()}',
             "task": settings.TRADINGVIEW_STRATEGY_CHECK_TASK,
-            "interval": TimeInterval.convert_to_interval_model(instance.running_interval)[0],
-            "args": json.dumps([instance.id, ]),
-            "start_time": timezone.now().replace(**TimeInterval.get_replace_args(instance.running_interval))
+            "task_kwargs": json.dumps([instance.id, ]),
+            'crontab_code': instance.crontab_code
         }
     )
