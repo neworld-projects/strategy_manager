@@ -27,8 +27,8 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./data:/var/
-      - ./db_data:/var/lib/postgresql/data
+      - ./opt/data:/var/
+      - ./opt/db_data:/var/lib/postgresql/data
     networks:
       - services_handler_net
 
@@ -39,7 +39,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: '3q1b31mV21FmCx'
       PGADMIN_DEFAULT_EMAIL: 'lirezazadeh77@gmail.com'
     volumes:
-      - './pgadmin4:/pgadmin4'
+      - '/opt/pgadmin4:/pgadmin4'
     ports:
       - '8000:80'
     networks:
