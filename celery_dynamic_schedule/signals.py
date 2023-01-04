@@ -9,7 +9,8 @@ from celery_dynamic_schedule.models import CeleryDynamicSchedule
 
 @receiver(post_save, sender=CeleryDynamicSchedule)
 def create_periodic_task(sender, instance: CeleryDynamicSchedule, **kwargs):
-    schedule = crontab(instance.crontab_code)
+    schedule = instance.crontab_code.split(" ")
+    schedule = crontab(minute=schedule[0], hour=schedule[1], day_of_week=schedule[2], day_of_month=[3], month_of_year=[4])
     instance.run_crontab_minute = json.dumps(
         {j: j if list(schedule.minute).count(j) else k for j, k in {i: None for i in range(60)}.items()}
     )
