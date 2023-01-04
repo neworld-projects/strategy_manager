@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from celery_dynamic_schedule.models import CeleryDynamicSchedule
 from strategy_manager.celery import app
@@ -16,4 +17,4 @@ def active_tasks():
         }
     )
     for active_task in active_tasks_for_run:
-        app.send_task(active_task.task, args=list(active_task.task_args))
+        app.send_task(active_task.task, args=json.loads(active_task.task_args))
