@@ -98,7 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'base': {
             'format': '{levelname}: {asctime}  module={module} filename={filename} pathname={pathname} lineno={lineno} '
