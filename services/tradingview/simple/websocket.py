@@ -15,7 +15,8 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
 
     def __init__(self, instance: TradingViewStrategy):
         self.instance = instance
-        super(WebSocketConnectionSampleChart, self).__init__(self.instance.symbol, self.instance.get_timeframe_display())
+        super(WebSocketConnectionSampleChart, self).__init__(self.instance.symbol,
+                                                             self.instance.get_timeframe_display())
         self.strategy_settings = get_strategy_str(
             self.instance.pine_id,
             self.instance.pine_version,
@@ -47,27 +48,30 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
             # TODO: send to broker
             pass
 
+    def check_message(self, result):
+        strategy_values = result['p'][1].get('st7')
+        if strategy_values:
+            strategy_values = strategy_values['st'][-1]['v']
+            current_state = StateInformation(
+                strategy_values[0],
+                strategy_values[1],
+                TpsValue(strategy_values[2:-1]),
+                strategy_values[-1]
+            )
+            if current_state.datetime_timestamp != self.last_state.datetime_timestamp > 0 != self.last_state.open_position_value:
+                position_data = TelegramOpenPositionMessageBuilder(self.last_state, current_state)
+                self.send_position_data(position_data)
+            self.last_state = current_state
+            logging.info("last state", extra={'info': self.last_state.__dict__})
+
     def on_message(self, ws, message):
         try:
             results = super(WebSocketConnectionSampleChart, self).on_message(ws, message)
             if results is None:
                 return results
             for result in results:
-                if result['m'] == 'du':
-                    strategy_values = result['p'][1].get('st7')
-                    if strategy_values:
-                        strategy_values = strategy_values['st'][-1]['v']
-                        current_state = StateInformation(
-                            strategy_values[0],
-                            strategy_values[1],
-                            TpsValue(strategy_values[2:-1]),
-                            strategy_values[-1]
-                        )
-                        if 0 < self.last_state.datetime_timestamp != current_state.datetime_timestamp \
-                                and self.last_state.open_position_value != 0:
-                            position_data = TelegramOpenPositionMessageBuilder(self.last_state, current_state)
-                            self.send_position_data(position_data)
-                        self.last_state = current_state
+                if result.get('m') == 'du':
+                    self.check_message(result)
 
         except Exception as e:
             logging.error(e)
