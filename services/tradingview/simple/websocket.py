@@ -39,7 +39,7 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
 
     def send_position_data(self, position_data: TelegramOpenPositionMessageBuilder):
         position_data = position_data.__dict__
-        logging.info("open position data", extra={'info': position_data})
+        logging.info(f"open position data {position_data}")
         third_party_manager.apply_async(
             args=(position_data, settings.TELEGRAM_MODULE),
             kwargs={'chat_id': self.instance.telegram_id}
@@ -62,7 +62,7 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
                 position_data = TelegramOpenPositionMessageBuilder(self.last_state, current_state)
                 self.send_position_data(position_data)
             self.last_state = current_state
-            logging.info("last state", extra={'info': self.last_state.__dict__})
+            logging.info(f"last state {self.last_state.__dict__}")
 
     def on_message(self, ws, message):
         try:
