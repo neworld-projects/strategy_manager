@@ -7,6 +7,7 @@ from typing import List
 class TpsValue:
     tps: list[float] = None
 
+    @property
     def __dict__(self):
         return {f"tps{i}": self.tps[i] for i in range(self.tps.__len__())}
 
@@ -23,13 +24,13 @@ class StateInformation:
 class TelegramOpenPositionMessageBuilder:
     datetime_timestamp: str
     open_position_value: float
-    tps_value: TpsValue
+    tps_value: dict
     close_position_value: float
     position_mode: str
 
     def __init__(self, last_state: StateInformation, current_state: StateInformation):
         self.datetime_timestamp = datetime.utcfromtimestamp(current_state.datetime_timestamp).__str__()
         self.open_position_value = last_state.open_position_value
-        self.tps_value = last_state.tps_value
+        self.tps_value = last_state.tps_value.__dict__
         self.close_position_value = last_state.close_position_value
         self.position_mode = "long" if last_state.close_position_value > last_state.open_position_value else "short"

@@ -9,5 +9,5 @@ from helpers.send_to_third_party import third_party_call
     autoretry_for=(Exception, ),
     max_retries=3
 )
-def third_party_manager(imessage: dict, target: str, message_mode: str = 'html', **kwargs):
-    third_party_call(imessage, target, message_mode='html', **kwargs)
+def third_party_manager(message: dict, target: str, message_mode: str = 'html', **kwargs):
+    third_party_call(message, target, message_mode=message_mode, **kwargs)
