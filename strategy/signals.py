@@ -14,8 +14,9 @@ def create_periodic_task(sender, instance: TradingViewStrategy, **kwargs):
     CeleryDynamicSchedule.objects.update_or_create(
         task=settings.TRADINGVIEW_STRATEGY_CHECK_TASK,
         task_args=json.dumps([instance.id, ]),
-        crontab_code=instance.crontab_code,
         defaults={
             "name": f'{instance.name}-{uuid.uuid4()}',
-        }
+            'crontab_code': instance.crontab_code,
+
+    }
     )
