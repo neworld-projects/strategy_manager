@@ -105,5 +105,5 @@ def get_strategy_str(pine_id, pine_version, script_mode):
         ]
     }
     # TODO: change message number with timeframe
-    data = f'~m~2502~m~{json.dumps(setting_dictionary)}'.replace(" ", '')
+    data = f'~m~2498~m~{json.dumps(setting_dictionary)}'.replace(" ", '')
     return data
