@@ -11,7 +11,7 @@ from strategy.models import TradingViewStrategy
 
 @receiver(post_save, sender=TradingViewStrategy)
 def create_periodic_task(sender, instance: TradingViewStrategy, **kwargs):
-    CeleryDynamicSchedule.objects.get_or_create(
+    CeleryDynamicSchedule.objects.update_or_create(
         name=f'{instance.name}-{uuid.uuid4()}',
         defaults={
             "task": settings.TRADINGVIEW_STRATEGY_CHECK_TASK,
