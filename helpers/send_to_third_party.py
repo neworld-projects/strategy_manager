@@ -27,4 +27,4 @@ def third_party_call(message: dict, target: str, message_mode: str = 'html', *ar
 
 
 def telegram_sender(message: str, *args, **kwargs) -> None:
-    send_message(kwargs['chat_id'], message)
+    send_message(message, kwargs['chat_id'])
