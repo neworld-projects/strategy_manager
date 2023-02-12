@@ -33,4 +33,4 @@ class TelegramOpenPositionMessageBuilder:
         self.open_position_value = last_state.open_position_value
         self.tps_value = last_state.tps_value.__dict__
         self.close_position_value = last_state.close_position_value
-        self.position_mode = "long" if last_state.close_position_value > last_state.open_position_value else "short"
+        self.position_mode = "long" if last_state.close_position_value < last_state.open_position_value else "short"
