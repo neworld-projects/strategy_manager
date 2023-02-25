@@ -2,7 +2,6 @@ import _thread
 import logging
 import re
 from json import loads
-from time import sleep
 
 import websocket
 from django.conf import settings
@@ -33,7 +32,6 @@ class OpenWebsocketConnection:
         return []
 
     def on_message(self, ws, message):
-        print(message)
         if re.search("~m~[0-9]+~m~~h~[0-9]+", message):
             ws.send(message)
             return None
