@@ -1,5 +1,7 @@
 import _thread
+import datetime
 import logging
+import platform
 import re
 from json import loads
 
@@ -48,8 +50,16 @@ class OpenWebsocketConnection:
     def on_error(self, ws, error):
         logging.error(error, extra={'info': {"timeframe": self.timeframe}})
 
-    def on_close(self, ws, close_status_code, close_msg):
+    def on_close(self, ws, close_status_code, close_msg, third_party_manager=None):
         logging.warning('close', extra={'info': {"timeframe": self.timeframe}})
+        if not settings.DEVEL:
+            third_party_manager.apply_async(
+                args=({"message": "something want wrong",
+                       "time": datetime.datetime.now(),
+                       "symbol": self.symbol,
+                       "hostname": platform.uname().node}, settings.TELEGRAM_MODULE),
+                kwargs={'chat_id': settings.TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM}
+        )
 
     def on_open(self, ws):
         def run(*args):

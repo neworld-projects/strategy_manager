@@ -149,6 +149,7 @@ TRADINGVIEW_USERNAME = config('TRADINGVIEW_USERNAME', default='')
 # telegram config
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN', default="")
 TELEGRAM_MODULE = config('TELEGRAM_MODULE', default='telegram_sender')
+TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM = config('TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM', default="")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
