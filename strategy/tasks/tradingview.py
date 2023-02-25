@@ -4,7 +4,7 @@ import logging
 from celery import shared_task
 from django.conf import settings
 
-from services.tradingview.simple.websocket import WebSocketConnectionSampleChart
+from services.tradingview.simple.websocket import WebSocketConnectionChartForStrategyManager
 from strategy.models import TradingViewStrategy
 
 
@@ -15,5 +15,5 @@ from strategy.models import TradingViewStrategy
 def check_tradingview_strategy(instance_id):
     logging.info(f"tobe start instance: {instance_id}")
     instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
-    WebSocketConnectionSampleChart(instance)
+    WebSocketConnectionChartForStrategyManager(instance)
 

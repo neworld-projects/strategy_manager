@@ -6,29 +6,34 @@ from json import loads
 import websocket
 from django.conf import settings
 
-from services.tradingview.core.configs import token, chart_session, quote_session, add_symbols, headers, create_series, \
-    switch_timezone
+from services.tradingview.core.configs import TradingViewConfig
 
 logging.DEBUG = False
 
 
 class OpenWebsocketConnection:
-    def __init__(self, symbol: str, timeframe: str):
+    def __init__(self, symbol: str, timeframe: str, chart_type: str = "sample"):
+        self.config = TradingViewConfig(symbol, timeframe)
+        self.chart_type = chart_type
         self.timeframe = timeframe
         self.timeframe_for_send = loads(self.timeframe)
         self.symbol = symbol
         self.tradingview_websocket_url = settings.TRADINGVIEW_WEBSOCKET_URL
         websocket.enableTrace(True)
         self.ws_app = websocket.WebSocketApp(url=self.tradingview_websocket_url,
-                                             header=headers,
+                                             header=self.config.headers,
                                              on_open=self.on_open,
                                              on_message=self.on_message,
                                              on_error=self.on_error,
                                              on_close=self.on_close,
                                              )
 
+    def extra_on_open_messages(self):
+        return []
+
     def on_message(self, ws, message):
         if re.search("~m~[0-9]+~m~~h~[0-9]+", message):
+            print(message)
             ws.send(message)
             return None
         else:
@@ -49,17 +54,26 @@ class OpenWebsocketConnection:
 
     def on_open(self, ws):
         def run(*args):
-            ws.send(token)
+            ws.send(self.config.get_token_message)
 
-            ws.send(chart_session)
+            ws.send(self.config.get_chart_session_message)
 
-            ws.send(switch_timezone)
+            ws.send(self.config.get_switch_timezone_message)
 
-            ws.send(quote_session)
+            ws.send(self.config.get_quote_session_message)
 
-            ws.send(add_symbols(self.symbol))
+            ws.send(self.config.get_add_symbols_message)
+
+            if self.chart_type == "sample":
+                ws.send(self.config.get_resolve_sample_chart_message)
+            elif self.chart_type == "heikinashi":
+                ws.send(self.config.get_resolve_heikinashi_chart_message)
+
+            ws.send(self.config.get_create_series_message(300))
+
+            for extra_on_open_message in self.extra_on_open_messages():
+                # ws.send(extra_on_open_message)
+                logging.warning(extra_on_open_message)
+            logging.warning("part9")
 
         _thread.start_new_thread(run, ())
-
-    def continue_opening(self, ws):
-        ws.send(create_series(self.timeframe_for_send['name'], 300))

@@ -17,3 +17,8 @@ class TimeframeChoice(models.IntegerChoices):
 class TradingViewScriptModeChoice(models.TextChoices):
     STRATEGY = 'strategy', _('strategy')
     INDICATOR = 'indicator', _('indicator')
+
+
+class ChartTypeChoice(models.IntegerChoices):
+    SAMPLE = 0, 'sample'
+    HEIKINASHI = 1, 'heikinashi'

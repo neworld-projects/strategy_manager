@@ -1,6 +1,6 @@
 from django.db import models
 
-from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice
+from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice, ChartTypeChoice
 
 
 class TradingViewStrategy(models.Model):
@@ -21,3 +21,4 @@ class TradingViewStrategy(models.Model):
     )
     telegram_id = models.CharField(max_length=20)
     broker_is_active = models.BooleanField(default=False)
+    chart_type = models.IntegerField(choices=ChartTypeChoice.choices, db_index=True, default=ChartTypeChoice.SAMPLE)

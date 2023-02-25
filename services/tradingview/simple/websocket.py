@@ -1,52 +1,47 @@
-import _thread
 import logging
-from time import sleep
 
 from django.conf import settings
 
 from services.tradingview.core.base_socket import OpenWebsocketConnection
-from services.tradingview.core.configs import resolve_sample_chart, get_strategy_str
 from strategy.DTOs import StateInformation, TpsValue, TelegramOpenPositionMessageBuilder
 from strategy.models import TradingViewStrategy
 from strategy.tasks.third_party import third_party_manager
 
 
-class WebSocketConnectionSampleChart(OpenWebsocketConnection):
+class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
 
     def __init__(self, instance: TradingViewStrategy):
+        self.strategy_settings = None
         self.instance = instance
-        super(WebSocketConnectionSampleChart, self).__init__(self.instance.symbol,
-                                                             self.instance.get_timeframe_display())
-        self.strategy_settings = get_strategy_str(
+
+        super(WebSocketConnectionChartForStrategyManager, self).__init__(
+            self.instance.symbol,
+            self.instance.get_timeframe_display(),
+            self.instance.get_chart_type_display()
+        )
+
+        self.last_state = StateInformation()
+        self.ws_app.run_forever()
+
+    def extra_on_open_messages(self):
+        self.strategy_settings = self.config.get_strategy_message(
             self.instance.pine_id,
             self.instance.pine_version,
             self.instance.script_mode
         )
-        self.last_state = StateInformation()
-        self.ws_app.run_forever()
-
-    def on_open(self, ws):
-        super(WebSocketConnectionSampleChart, self).on_open(ws)
-        sleep(10)
-        logging.info("channel was opened")
-
-        def self_setting():
-            ws.send(resolve_sample_chart(self.symbol))
-            super(WebSocketConnectionSampleChart, self).continue_opening(ws)
-            ws.send(self.strategy_settings)
-
-        _thread.start_new_thread(self_setting, ())
+        return [self.strategy_settings, ]
 
     def send_position_data(self, position_data: TelegramOpenPositionMessageBuilder):
         position_data = position_data.__dict__
         logging.info(f"open position data {position_data}")
-        third_party_manager.apply_async(
-            args=(position_data, settings.TELEGRAM_MODULE),
-            kwargs={'chat_id': self.instance.telegram_id}
-        )
-        if self.instance.broker_is_active:
-            # TODO: send to broker
-            pass
+        if not settings.DEVEL:
+            third_party_manager.apply_async(
+                args=(position_data, settings.TELEGRAM_MODULE),
+                kwargs={'chat_id': self.instance.telegram_id}
+            )
+            if self.instance.broker_is_active:
+                # TODO: send to broker
+                pass
 
     def check_message(self, result):
         strategy_values = result['p'][1].get('st7')
@@ -66,7 +61,7 @@ class WebSocketConnectionSampleChart(OpenWebsocketConnection):
 
     def on_message(self, ws, message):
         try:
-            results = super(WebSocketConnectionSampleChart, self).on_message(ws, message)
+            results = super(WebSocketConnectionChartForStrategyManager, self).on_message(ws, message)
             if results is None:
                 return results
             for result in results:
