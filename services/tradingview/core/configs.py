@@ -39,9 +39,9 @@ class TradingViewConfig:
         "origin": "https://www.tradingview.com",
     }
 
-    def __init__(self, name: str, timeframe: str):
+    def __init__(self, name: str, timeframe: dict):
         self.name = name.upper()
-        self.timeframe = timeframe
+        self.timeframe = timeframe['name']
 
     @staticmethod
     def convert_to_str_send_message(message: dict) -> str:
@@ -138,7 +138,7 @@ class TradingViewConfig:
 
     def get_create_series_message(self, length: int) -> str:
         m = "create_series"
-        p = [settings.CS_TOKEN, "sds_1", "s1", "sds_sym_1", self.timeframe, str(length)]
+        p = [settings.CS_TOKEN, "sds_1", "s1", "sds_sym_1", self.timeframe, length, ""]
         return self.compile_message(m, p)
 
     def get_more_data_message(self, length: int) -> str:

@@ -2,6 +2,7 @@ import _thread
 import logging
 import re
 from json import loads
+from time import sleep
 
 import websocket
 from django.conf import settings
@@ -13,10 +14,10 @@ logging.DEBUG = False
 
 class OpenWebsocketConnection:
     def __init__(self, symbol: str, timeframe: str, chart_type: str = "sample"):
-        self.config = TradingViewConfig(symbol, timeframe)
         self.chart_type = chart_type
         self.timeframe = timeframe
         self.timeframe_for_send = loads(self.timeframe)
+        self.config = TradingViewConfig(symbol, self.timeframe_for_send)
         self.symbol = symbol
         self.tradingview_websocket_url = settings.TRADINGVIEW_WEBSOCKET_URL
         websocket.enableTrace(True)
@@ -32,8 +33,8 @@ class OpenWebsocketConnection:
         return []
 
     def on_message(self, ws, message):
+        print(message)
         if re.search("~m~[0-9]+~m~~h~[0-9]+", message):
-            print(message)
             ws.send(message)
             return None
         else:
@@ -72,8 +73,6 @@ class OpenWebsocketConnection:
             ws.send(self.config.get_create_series_message(300))
 
             for extra_on_open_message in self.extra_on_open_messages():
-                # ws.send(extra_on_open_message)
-                logging.warning(extra_on_open_message)
-            logging.warning("part9")
+                ws.send(extra_on_open_message)
 
         _thread.start_new_thread(run, ())
