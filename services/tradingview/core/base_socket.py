@@ -9,6 +9,8 @@ import websocket
 from django.conf import settings
 
 from services.tradingview.core.configs import TradingViewConfig
+from strategy.tasks.third_party import third_party_manager
+
 
 logging.DEBUG = False
 
@@ -50,7 +52,7 @@ class OpenWebsocketConnection:
     def on_error(self, ws, error):
         logging.error(error, extra={'info': {"timeframe": self.timeframe}})
 
-    def on_close(self, ws, close_status_code, close_msg, third_party_manager=None):
+    def on_close(self, ws, close_status_code, close_msg):
         logging.warning('close', extra={'info': {"timeframe": self.timeframe}})
         if not settings.DEVEL:
             third_party_manager.apply_async(
@@ -59,7 +61,7 @@ class OpenWebsocketConnection:
                        "symbol": self.symbol,
                        "hostname": platform.uname().node}, settings.TELEGRAM_MODULE),
                 kwargs={'chat_id': settings.TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM}
-        )
+            )
 
     def on_open(self, ws):
         def run(*args):
