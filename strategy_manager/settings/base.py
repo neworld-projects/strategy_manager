@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # local apps
     'strategy',
     'celery_dynamic_schedule',
+    'broker_manager'
 
 ]
 
@@ -138,6 +139,7 @@ SHARED_TASK_TIME_LIMIT = config('SHARED_TASK_TIME_LIMIT', default=10, cast=int)
 # task names
 TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'
 THIRD_PARTY_MANAGER_TASK = 'third_party_manager'
+SEND_BROKER = "send_broker"
 
 # websocket configs
 TRADINGVIEW_WEBSOCKET_URL = config("TRADINGVIEW_WEBSOCKET_URL", default='')
@@ -150,6 +152,13 @@ TRADINGVIEW_USERNAME = config('TRADINGVIEW_USERNAME', default='')
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN', default="")
 TELEGRAM_MODULE = config('TELEGRAM_MODULE', default='telegram_sender')
 TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM = config('TELEGRAM_CHAT_ID_FOR_TRACK_PROBLEM', default="")
+
+BINANCE_CONFIG = {
+    "host": config("BINANCE_HOST", default=""),
+    'api_key': config('BINANCE_API_KEY', default=""),
+    'secret_key': config('BINANCE_SECRET_KEY', default=""),
+    "new_order_endpoint_future": config("BINANCE_NEW_ORDER_ENDPOINT_FUTURE", default="/fapi/v1/order")
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

@@ -5,6 +5,7 @@ from django.conf import settings
 from services.tradingview.core.base_socket import OpenWebsocketConnection
 from strategy.DTOs import StateInformation, TpsValue, TelegramOpenPositionMessageBuilder
 from strategy.models import TradingViewStrategy
+from strategy.tasks.send_broker import send_request_to_broker
 from strategy.tasks.third_party import third_party_manager
 
 
@@ -32,16 +33,24 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
         return [self.strategy_settings, ]
 
     def send_position_data(self, position_data: TelegramOpenPositionMessageBuilder):
-        position_data = position_data.__dict__
-        logging.info(f"open position data {position_data}")
+        position_data_dict = position_data.__dict__
+        logging.info(f"open position data {position_data_dict}")
         if not settings.DEVEL:
             third_party_manager.apply_async(
-                args=(position_data, settings.TELEGRAM_MODULE),
+                args=(position_data_dict, settings.TELEGRAM_MODULE),
                 kwargs={'chat_id': self.instance.telegram_id}
             )
             if self.instance.broker_is_active:
-                # TODO: send to broker
-                pass
+                send_request_to_broker.apply_async(
+                    self.instance.symbol,
+                    self.instance.base_capital,
+                    position_data.datetime_timestamp,
+                    position_data.tps_value['tps'],
+                    position_data.close_position_value,
+                    position_data.position_mode,
+                    self.instance._meta.db_table,
+                    self.instance.id,
+                )
 
     def check_message(self, result):
         strategy_values = result['p'][1].get('st7')
