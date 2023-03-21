@@ -18,7 +18,6 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
         super(WebSocketConnectionChartForStrategyManager, self).__init__(
             self.instance.symbol,
             self.instance.get_timeframe_display(),
-            self.instance.get_chart_type_display()
         )
 
         self.last_state = StateInformation()

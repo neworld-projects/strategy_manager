@@ -16,8 +16,7 @@ logging.DEBUG = False
 
 
 class OpenWebsocketConnection:
-    def __init__(self, symbol: str, timeframe: str, chart_type: str = "sample"):
-        self.chart_type = chart_type
+    def __init__(self, symbol: str, timeframe: str):
         self.timeframe = timeframe
         self.timeframe_for_send = loads(self.timeframe)
         self.config = TradingViewConfig(symbol, self.timeframe_for_send)
@@ -75,10 +74,7 @@ class OpenWebsocketConnection:
 
             ws.send(self.config.get_add_symbols_message)
 
-            if self.chart_type == "sample":
-                ws.send(self.config.get_resolve_sample_chart_message)
-            elif self.chart_type == "heikinashi":
-                ws.send(self.config.get_resolve_heikinashi_chart_message)
+            ws.send(self.config.get_resolve_sample_chart_message)
 
             ws.send(self.config.get_create_series_message(300))
 

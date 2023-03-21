@@ -19,11 +19,6 @@ class TradingViewScriptModeChoice(models.TextChoices):
     INDICATOR = 'indicator', _('indicator')
 
 
-class ChartTypeChoice(models.IntegerChoices):
-    SAMPLE = 0, 'sample'
-    HEIKINASHI = 1, 'heikinashi'
-
-
 class Broker(models.IntegerChoices):
     BINANCE = 0, 'binance'
 

@@ -122,20 +122,6 @@ class TradingViewConfig:
         p = [settings.CS_TOKEN, 'sds_sym_1', f"={json.dumps(extra1)}"]
         return self.compile_message(m, p)
 
-    @property
-    def get_resolve_heikinashi_chart_message(self) -> str:
-        m = "resolve_symbol"
-        extra1 = {
-            "symbol": {
-                "symbol": f"BINANCE:{self.name}",
-                "adjustment": "splits"
-            },
-            "type": "BarSetHeikenAshi@tv-basicstudies-60!",
-            "inputs": {}
-        }
-        p = [settings.CS_TOKEN, 'sds_sym_1', f"={json.dumps(extra1)}"]
-        return self.compile_message(m, p)
-
     def get_create_series_message(self, length: int) -> str:
         m = "create_series"
         p = [settings.CS_TOKEN, "sds_1", "s1", "sds_sym_1", self.timeframe, length, ""]
