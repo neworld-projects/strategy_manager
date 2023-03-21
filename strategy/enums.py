@@ -26,3 +26,8 @@ class ChartTypeChoice(models.IntegerChoices):
 
 class Broker(models.IntegerChoices):
     BINANCE = 0, 'binance'
+
+
+class MarginType(models.IntegerChoices):
+    ISOLATED = 0, 'ISOLATED'
+    CROSSED = 1, 'CROSSED'

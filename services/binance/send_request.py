@@ -10,7 +10,8 @@ from django.utils.datetime_safe import datetime
 from broker_manager.enums import PositionTypeChoice, Broker, PositionSideChoice
 from broker_manager.models import PositionManager
 from broker_manager.repository.broker_manager_repository import BrokerManagerRepository
-from services.binance.settings import HOST, APIKEY, NEW_ORDER_ENDPOINT_FUTURE
+from services.binance.settings import HOST, APIKEY, SECRET_KEY, NEW_ORDER_ENDPOINT_FUTURE, POSITION_INFORMATION, \
+    CHANGE_LEVERAGE
 
 
 class SendRequest:
@@ -24,7 +25,7 @@ class SendRequest:
     def __add_signature_and_timestamp(data: dict) -> dict:
         data['timestamp'] = int(datetime.now().timestamp())
         data['signature'] = hmac.new(
-            bytes("2b5eb11e18796d12d88f13dc27dbbd02c2cc51ff7059765ed9821957d82bb4d9", 'latin-1'),
+            bytes(SECRET_KEY, 'latin-1'),
             msg=bytes(urlencode(data), 'latin-1'),
             digestmod=hashlib.sha256
         ).hexdigest()
@@ -35,7 +36,20 @@ class SendRequest:
         response = requests.post(
             url=urljoin(HOST, endpoint),
             headers=self.__headers,
-            json=data,
+            json=self.__add_signature_and_timestamp(data),
+
+        )
+        end = datetime.now()
+        return response.ok, response.status_code, response.json(), start, end
+
+    def __send_get(self, endpoint, data=None) -> (bool, int, dict, datetime, datetime):
+        if data is None:
+            data = dict()
+        start = datetime.now()
+        response = requests.get(
+            url=urljoin(HOST, endpoint),
+            headers=self.__headers,
+            json=self.__add_signature_and_timestamp(data),
 
         )
         end = datetime.now()
@@ -117,3 +131,33 @@ class SendRequest:
             check_list.append(check)
 
         return all(check_list)
+
+    def create_market_position(self, coin_name: str, quantity: float):
+        body = {
+            "symbol": coin_name,
+            "side": "SELL",
+            "type": PositionTypeChoice.MARKET.name,
+            "quantity": quantity,
+        }
+        check, status_code, message, start, end = self.__send_post(NEW_ORDER_ENDPOINT_FUTURE, body)
+        return check
+
+    def get_all_position(self) -> (bool, int, dict, datetime, datetime):
+        check, status_code, message, start, end = self.__send_get(POSITION_INFORMATION)
+        return check, status_code, message, start, end
+
+    def change_leverage(self, leverage: int, coin_name: str) -> (bool, int, dict, datetime, datetime):
+        body = {
+            "symbol": coin_name,
+            'leverage': leverage
+        }
+        check, status_code, message, start, end = self.__send_post(CHANGE_LEVERAGE, body)
+        return check, status_code, message, start, end
+
+    def change_margin_type(self, coin_name: str, margin_type: str) -> (bool, int, dict, datetime, datetime):
+        body = {
+            "symbol": coin_name,
+            'marginType': margin_type
+        }
+        check, status_code, message, start, end = self.__send_post(CHANGE_LEVERAGE, body)
+        return check, status_code, message, start, end

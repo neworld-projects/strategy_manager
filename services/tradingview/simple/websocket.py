@@ -53,6 +53,8 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                         self.instance._meta.db_table,
                         self.instance.id,
                         self.instance.telegram_id,
+                        self.instance.get_margin_type_display(),
+                        self.instance.leverage
                     ),
                     expires=60
                 )

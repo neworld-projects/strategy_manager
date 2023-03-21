@@ -157,7 +157,9 @@ BINANCE_CONFIG = {
     "host": config("BINANCE_HOST", default=""),
     'api_key': config('BINANCE_API_KEY', default=""),
     'secret_key': config('BINANCE_SECRET_KEY', default=""),
-    "new_order_endpoint_future": config("BINANCE_NEW_ORDER_ENDPOINT_FUTURE", default="/fapi/v1/order")
+    "new_order_endpoint_future": config("BINANCE_NEW_ORDER_ENDPOINT_FUTURE", default="/fapi/v1/order"),
+    'position_information': config('BINANCE_POSITION_INFORMATION', default='/fapi/v2/positionRisk'),
+    'change_leverage': config('BINANCE_CHANGE_LEVERAGE', default='/fapi/v1/leverage')
 }
 
 # Internationalization

@@ -1,6 +1,6 @@
 from django.db import models
 
-from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice, ChartTypeChoice, Broker
+from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice, ChartTypeChoice, Broker, MarginType
 
 
 class TradingViewStrategy(models.Model):
@@ -23,3 +23,5 @@ class TradingViewStrategy(models.Model):
     broker_is_active = models.BooleanField(default=False)
     broker = models.IntegerField(choices=Broker.choices, default=Broker.BINANCE, db_index=True)
     chart_type = models.IntegerField(choices=ChartTypeChoice.choices, db_index=True, default=ChartTypeChoice.SAMPLE)
+    leverage = models.IntegerField(default=1)
+    margin_type = models.IntegerField(choices=MarginType.choices, default=MarginType.ISOLATED, db_index=True)
