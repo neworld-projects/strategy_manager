@@ -8,6 +8,7 @@ import requests
 from django.utils.datetime_safe import datetime
 
 from broker_manager.enums import PositionTypeChoice, Broker, PositionSideChoice
+from broker_manager.models import PositionManager
 from broker_manager.repository.broker_manager_repository import BrokerManagerRepository
 from services.binance.settings import HOST, APIKEY, NEW_ORDER_ENDPOINT_FUTURE
 
@@ -29,21 +30,64 @@ class SendRequest:
         ).hexdigest()
         return data
 
-    def send_post(self, endpoint: str, data: dict) -> (bool, int, dict, datetime, datetime):
+    def __send_post(self, endpoint: str, data: dict) -> (bool, int, dict, datetime, datetime):
         start = datetime.now()
         response = requests.post(
             url=urljoin(HOST, endpoint),
-            headers=self.headers,
+            headers=self.__headers,
             json=data,
 
         )
         end = datetime.now()
         return response.ok, response.status_code, response.json(), start, end
 
+    def __send_and_save(
+            self,
+            coin_name: str,
+            position_mode: PositionSideChoice,
+            quantity: float,
+            open_position_value: float,
+            side: str,
+            datetime_timestamp: str,
+            request_from: str,
+            request_id: int,
+            position_type: PositionTypeChoice,
+            position_instance=None
+    ) -> (PositionManager, bool):
+        body = {
+            "symbol": coin_name,
+            "side": side,
+            "positionSide": position_mode.name,
+            "type": position_type.name,
+            "quantity": quantity,
+            "price": open_position_value,
+        }
+        if side == "SELL":
+            body['stopPrice'] = open_position_value
+
+        check, status_code, message, start, end = self.__send_post(NEW_ORDER_ENDPOINT_FUTURE, body)
+        position = BrokerManagerRepository().open_future_position(
+            datetime_timestamp,
+            open_position_value,
+            position_mode,
+            coin_name,
+            quantity,
+            position_type,
+            start,
+            end,
+            status_code,
+            json.dumps(message),
+            request_from,
+            request_id,
+            Broker.BINANCE.value,
+            position_instance
+        )
+        return position, check
+
     def create_limit_position_with_tps_and_loss_in_future(
             self,
             coin_name: str,
-            quantity: int,
+            quantity: float,
             datetime_timestamp: str,
             open_position_value: float,
             tps: List[float],
@@ -52,93 +96,24 @@ class SendRequest:
             request_from: str,
             request_id: int
     ) -> bool:
+
         position_mode = PositionSideChoice.LONG if position_mode == "long" else PositionSideChoice.SHORT
         check_list = []
-        # TODO: change quantity value to percentage
-        check, status_code, message, start, end = self.send_post(
-            NEW_ORDER_ENDPOINT_FUTURE,
-            {
-                "symbol": coin_name,
-                "side": "BUY",
-                "positionSide": position_mode.name,
-                "type": "LIMIT",
-                "quantity": quantity,
-                "price": open_position_value,
-            }
-        )
+        base_position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, open_position_value,
+                                                             "BUY", datetime_timestamp, request_from, request_id,
+                                                             PositionTypeChoice.LIMIT)
         check_list.append(check)
-        base_position = BrokerManagerRepository().open_future_position(
-            datetime_timestamp,
-            open_position_value,
-            position_mode,
-            coin_name,
-            quantity,
-            PositionTypeChoice.LIMIT,
-            start,
-            end,
-            status_code,
-            json.dumps(message),
-            request_from,
-            request_id,
-            Broker.BINANCE.value
-        )
+
         for tp in tps:
-            check, status_code, message, start, end = self.send_post(
-                NEW_ORDER_ENDPOINT_FUTURE,
-                {
-                    "symbol": coin_name,
-                    "side": "SELL",
-                    "positionSide": position_mode.name,
-                    "type": "TAKE_PROFIT",
-                    "quantity": quantity / len(tps),
-                    "price": tp,
-                    "stopPrice": tp
-                }
-            )
+            position_instance, check = self.__send_and_save(coin_name, position_mode, quantity / len(tps), tp, "SELL",
+                                                            datetime_timestamp, request_from, request_id,
+                                                            PositionTypeChoice.TAKE_PROFIT, base_position_instance)
             check_list.append(check)
-            BrokerManagerRepository().open_future_position(
-                datetime_timestamp,
-                tp,
-                position_mode,
-                coin_name,
-                quantity,
-                PositionTypeChoice.TAKE_PROFIT,
-                start,
-                end,
-                status_code,
-                json.dumps(message),
-                request_from,
-                request_id,
-                Broker.BINANCE.value,
-                base_position
-            )
-        check, status_code, message, start, end = self.send_post(
-            NEW_ORDER_ENDPOINT_FUTURE,
-            {
-                "symbol": coin_name,
-                "side": "SELL",
-                "positionSide": position_mode.name,
-                "type": "STOP",
-                "quantity": quantity,
-                "price": close_position_value,
-                "stopPrice": close_position_value
-            }
-        )
-        check_list.append(check)
-        BrokerManagerRepository().open_future_position(
-            datetime_timestamp,
-            close_position_value,
-            position_mode,
-            coin_name,
-            quantity,
-            PositionTypeChoice.STOP,
-            start,
-            end,
-            status_code,
-            json.dumps(message),
-            request_from,
-            request_id,
-            Broker.BINANCE.value,
-            base_position
-        )
+
+        if close_position_value != 0:
+            position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, close_position_value,
+                                                            "SELL", datetime_timestamp, request_from, request_id,
+                                                            PositionTypeChoice.STOP, base_position_instance)
+            check_list.append(check)
+
         return all(check_list)

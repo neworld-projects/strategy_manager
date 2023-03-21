@@ -21,7 +21,7 @@ class StateInformation:
 
 
 @dataclass
-class TelegramOpenPositionMessageBuilder:
+class OpenPositionMessageBuilder:
     datetime_timestamp: str
     open_position_value: float
     tps_value: dict

@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from services.tradingview.core.base_socket import OpenWebsocketConnection
-from strategy.DTOs import StateInformation, TpsValue, TelegramOpenPositionMessageBuilder
+from strategy.DTOs import StateInformation, TpsValue, OpenPositionMessageBuilder
 from strategy.models import TradingViewStrategy
 from strategy.tasks.send_broker import send_request_to_broker
 from strategy.tasks.third_party import third_party_manager
@@ -32,7 +32,7 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
         )
         return [self.strategy_settings, ]
 
-    def send_position_data(self, position_data: TelegramOpenPositionMessageBuilder):
+    def send_position_data(self, position_data: OpenPositionMessageBuilder):
         position_data_dict = position_data.__dict__
         logging.info(f"open position data {position_data_dict}")
         if not settings.DEVEL:
@@ -42,14 +42,19 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
             )
             if self.instance.broker_is_active:
                 send_request_to_broker.apply_async(
-                    self.instance.symbol,
-                    self.instance.base_capital,
-                    position_data.datetime_timestamp,
-                    position_data.tps_value['tps'],
-                    position_data.close_position_value,
-                    position_data.position_mode,
-                    self.instance._meta.db_table,
-                    self.instance.id,
+                    (
+                        self.instance.symbol,
+                        self.instance.base_capital / position_data.open_position_value,
+                        position_data.datetime_timestamp,
+                        position_data.open_position_value,
+                        position_data.tps_value['tps'],
+                        position_data.close_position_value,
+                        position_data.position_mode,
+                        self.instance._meta.db_table,
+                        self.instance.id,
+                        self.instance.telegram_id,
+                    ),
+                    expires=60
                 )
 
     def check_message(self, result):
@@ -63,7 +68,7 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                 strategy_values[-1]
             )
             if current_state.datetime_timestamp != self.last_state.datetime_timestamp > 0 != self.last_state.open_position_value:
-                position_data = TelegramOpenPositionMessageBuilder(self.last_state, current_state)
+                position_data = OpenPositionMessageBuilder(self.last_state, current_state)
                 self.send_position_data(position_data)
             self.last_state = current_state
             logging.info(f"last state {self.last_state.__dict__}")
