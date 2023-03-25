@@ -1,9 +1,9 @@
 import logging
-from typing import List
 
 from celery import shared_task
 from django.conf import settings
 
+from broker_manager.enums import PositionSideChoice
 from helpers.prepare_open_position import PrepareOpenPosition
 from services.binance.send_request import SendRequest as SendRequestBinance
 from strategy.tasks.third_party import third_party_manager
@@ -12,12 +12,8 @@ from strategy.tasks.third_party import third_party_manager
 @shared_task(name=settings.SEND_BROKER)
 def send_request_to_broker(
         coin_name: str,
-        quantity: float,
-        datetime_timestamp: str,
-        open_position_value: float,
-        tps: List[float],
-        close_position_value: float,
-        position_mode: str,
+        quantity: int,
+        position_object: dict,
         request_from: str,
         request_id: int,
         telegram_id: str,
@@ -27,23 +23,60 @@ def send_request_to_broker(
 ):
     logging.info(f"tobe start instance")
     check = False
-    check_prepare, message = PrepareOpenPosition(broker_name, coin_name, telegram_id).prepare_open_position(leverage,
-                                                                                                            margin_type)
+    check_prepare, message = PrepareOpenPosition(
+        broker_name,
+        coin_name,
+        telegram_id
+    ).prepare_open_position(
+        leverage,
+        margin_type
+    )
     if not check_prepare:
         message_data = message
     else:
         if broker_name == 'binance':
-            check = SendRequestBinance().create_limit_position_with_tps_and_loss_in_future(
-                coin_name,
-                quantity,
-                datetime_timestamp,
-                open_position_value,
-                tps,
-                close_position_value,
-                position_mode,
-                request_from,
-                request_id
-            )
+            datetime_timestamp = position_object.pop('datetime_timestamp')
+            position_mode = PositionSideChoice.LONG \
+                if position_object.pop('position_mode') == "long" \
+                else PositionSideChoice.SHORT
+            last_open_position_value = position_object.pop('last_open_position_value')
+            total_profit = [keys for keys in position_object.keys() if keys.find("take_profit_value")].__len__()
+            check_list = []
+            for key, value in position_object:
+                if key.find("open_position_value") != -1 and value != 0:
+                    position_status = SendRequestBinance().buy_position(
+                        coin_name,
+                        quantity / value,
+                        datetime_timestamp,
+                        value,
+                        position_mode,
+                        request_from,
+                        request_id
+                    )
+                    check_list.append(position_status)
+                elif key.find("close_position_value") != -1:
+                    position_status = SendRequestBinance().sell_position(
+                        coin_name,
+                        quantity / last_open_position_value,
+                        datetime_timestamp,
+                        value,
+                        position_mode,
+                        request_from,
+                        request_id
+                    )
+                    check_list.append(position_status)
+                elif key.find("take_profit_value") != -1:
+                    position_status = SendRequestBinance().sell_position(
+                        coin_name,
+                        quantity / last_open_position_value / total_profit,
+                        datetime_timestamp,
+                        value,
+                        position_mode,
+                        request_from,
+                        request_id
+                    )
+                    check_list.append(position_status)
+            check = all(check_list)
 
         if check:
             message_data = "successful send position"

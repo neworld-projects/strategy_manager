@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from services.tradingview.core.base_socket import OpenWebsocketConnection
-from strategy.DTOs import StateInformation, TpsValue, OpenPositionMessageBuilder
+from strategy.DTOs import StateInformation, OpenPositionMessageBuilder
 from strategy.models import TradingViewStrategy
 from strategy.tasks.send_broker import send_request_to_broker
 from strategy.tasks.third_party import third_party_manager
@@ -19,7 +19,7 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
             self.instance.symbol,
             self.instance.get_timeframe_display(),
         )
-
+        self.strategy_model = instance.strategy_model
         self.last_state = StateInformation()
         self.ws_app.run_forever()
 
@@ -43,17 +43,13 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                 send_request_to_broker.apply_async(
                     (
                         self.instance.symbol,
-                        self.instance.base_capital / position_data.open_position_value,
-                        position_data.datetime_timestamp,
-                        position_data.open_position_value,
-                        position_data.tps_value['tps'],
-                        position_data.close_position_value,
-                        position_data.position_mode,
+                        self.instance.base_capital,
+                        position_data_dict,
                         self.instance._meta.db_table,
                         self.instance.id,
                         self.instance.telegram_id,
+                        self.instance.leverage,
                         self.instance.get_margin_type_display(),
-                        self.instance.leverage
                     ),
                     expires=60
                 )
@@ -64,12 +60,12 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
             strategy_values = strategy_values['st'][-1]['v']
             current_state = StateInformation(
                 strategy_values[0],
-                strategy_values[1],
-                TpsValue(strategy_values[2:-1]),
+                strategy_values[1:-2],
+                "long" if strategy_values[-2] == 1 else "short" if strategy_values[-2] == -1 else "",
                 strategy_values[-1]
             )
-            if current_state.datetime_timestamp != self.last_state.datetime_timestamp > 0 != self.last_state.open_position_value:
-                position_data = OpenPositionMessageBuilder(self.last_state, current_state)
+            if current_state > self.last_state and self.last_state:
+                position_data = OpenPositionMessageBuilder(self.last_state, current_state, self.strategy_model)
                 self.send_position_data(position_data)
             self.last_state = current_state
             logging.info(f"last state {self.last_state.__dict__}")

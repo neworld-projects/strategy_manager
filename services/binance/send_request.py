@@ -98,39 +98,35 @@ class SendRequest:
         )
         return position, check
 
-    def create_limit_position_with_tps_and_loss_in_future(
+    def buy_position(
             self,
             coin_name: str,
             quantity: float,
             datetime_timestamp: str,
-            open_position_value: float,
-            tps: List[float],
-            close_position_value: float,
-            position_mode: str,
+            position_value: float,
+            position_mode: PositionSideChoice,
             request_from: str,
             request_id: int
     ) -> bool:
-
-        position_mode = PositionSideChoice.LONG if position_mode == "long" else PositionSideChoice.SHORT
-        check_list = []
-        base_position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, open_position_value,
+        base_position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, position_value,
                                                              "BUY", datetime_timestamp, request_from, request_id,
                                                              PositionTypeChoice.LIMIT)
-        check_list.append(check)
+        return check
 
-        for tp in tps:
-            position_instance, check = self.__send_and_save(coin_name, position_mode, quantity / len(tps), tp, "SELL",
-                                                            datetime_timestamp, request_from, request_id,
-                                                            PositionTypeChoice.TAKE_PROFIT, base_position_instance)
-            check_list.append(check)
-
-        if close_position_value != 0:
-            position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, close_position_value,
-                                                            "SELL", datetime_timestamp, request_from, request_id,
-                                                            PositionTypeChoice.STOP, base_position_instance)
-            check_list.append(check)
-
-        return all(check_list)
+    def sell_position(
+            self,
+            coin_name: str,
+            quantity: float,
+            datetime_timestamp: str,
+            position_value: float,
+            position_mode: PositionSideChoice,
+            request_from: str,
+            request_id: int
+    ) -> bool:
+        position_instance, check = self.__send_and_save(coin_name, position_mode, quantity, position_value, "SELL",
+                                                        datetime_timestamp, request_from, request_id,
+                                                        PositionTypeChoice.TAKE_PROFIT)
+        return check
 
     def create_market_position(self, coin_name: str, quantity: float):
         body = {
