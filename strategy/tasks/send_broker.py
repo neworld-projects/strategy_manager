@@ -19,7 +19,7 @@ def send_request_to_broker(
         telegram_id: str,
         leverage: int,
         margin_type: str,
-        broker_name="binance"
+        broker_name: str
 ):
     logging.info(f"tobe start instance")
     check = False
