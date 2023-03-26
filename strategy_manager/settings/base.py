@@ -134,7 +134,7 @@ RABBIT_USERNAME = config('RABBIT_USERNAME', default='')
 RABBIT_PASSWORD = config('RABBIT_PASSWORD', default='')
 
 CELERY_BROKER_URL = f'amqp://{RABBIT_USERNAME}:{RABBIT_PASSWORD}@{RABBIT_HOST}:{RABBIT_PORT}'
-SHARED_TASK_TIME_LIMIT = config('SHARED_TASK_TIME_LIMIT', default=10, cast=int)
+SHARED_TASK_TIME_LIMIT = config('SHARED_TASK_TIME_LIMIT', default=5, cast=int)
 
 # task names
 TRADINGVIEW_STRATEGY_CHECK_TASK = 'tradingview_strategy_check'

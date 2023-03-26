@@ -6,7 +6,7 @@ from strategy_manager.celery import app
 
 
 def active_tasks():
-    now_datetime = datetime.datetime.now().replace(second=0, microsecond=0)
+    now_datetime = datetime.datetime.now().replace(second=0, microsecond=0) + datetime.timedelta(minutes=2)
     active_tasks_for_run = CeleryDynamicSchedule.objects.filter(
         **{
             f"run_crontab_minute__{now_datetime.minute}n": now_datetime.minute,
