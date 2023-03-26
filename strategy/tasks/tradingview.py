@@ -14,6 +14,9 @@ from strategy.models import TradingViewStrategy
 )
 def check_tradingview_strategy(instance_id):
     logging.info(f"tobe start instance: {instance_id}")
-    instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
-    WebSocketConnectionChartForStrategyManager(instance)
+    try:
+        instance = TradingViewStrategy.objects.get(id=instance_id, is_active=True)
+        WebSocketConnectionChartForStrategyManager(instance)
+    except TradingViewStrategy.DoesNotExist:
+        logging.error('DoesNotExist')
 
