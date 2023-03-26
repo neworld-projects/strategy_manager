@@ -1,6 +1,7 @@
 from django.db import models
 
-from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice, ChartTypeChoice
+from strategy.enums import TimeframeChoice, TradingViewScriptModeChoice, Broker, MarginType
+from strategy.help_texts import strategy_model_help_text
 
 
 class TradingViewStrategy(models.Model):
@@ -19,6 +20,9 @@ class TradingViewStrategy(models.Model):
         default=TradingViewScriptModeChoice.INDICATOR,
         max_length=20
     )
+    strategy_model = models.JSONField(default=dict, help_text=strategy_model_help_text)
     telegram_id = models.CharField(max_length=20)
     broker_is_active = models.BooleanField(default=False)
-    chart_type = models.IntegerField(choices=ChartTypeChoice.choices, db_index=True, default=ChartTypeChoice.SAMPLE)
+    broker = models.IntegerField(choices=Broker.choices, default=Broker.BINANCE, db_index=True)
+    leverage = models.IntegerField(default=1)
+    margin_type = models.IntegerField(choices=MarginType.choices, default=MarginType.ISOLATED, db_index=True)

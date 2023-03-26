@@ -6,3 +6,4 @@ celery~=5.2.7
 python-telegram-bot==13.12
 psycopg2==2.9.5
 uwsgi==2.0.21
+multimethod~=1.9.1

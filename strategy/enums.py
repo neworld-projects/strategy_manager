@@ -19,6 +19,16 @@ class TradingViewScriptModeChoice(models.TextChoices):
     INDICATOR = 'indicator', _('indicator')
 
 
-class ChartTypeChoice(models.IntegerChoices):
-    SAMPLE = 0, 'sample'
-    HEIKINASHI = 1, 'heikinashi'
+class Broker(models.IntegerChoices):
+    BINANCE = 0, 'binance'
+
+
+class MarginType(models.IntegerChoices):
+    ISOLATED = 0, 'ISOLATED'
+    CROSSED = 1, 'CROSSED'
+
+
+class PositionKeys(models.TextChoices):
+    OPEN_POSITION_VALUE = 'open_position_value', _('open_position_value')
+    CLOSE_POSITION_VALUE = 'close_position_value', _('close_position_value')
+    TAKE_PROFIT_VALUE = 'take_profit_value', _('take_profit_value')
