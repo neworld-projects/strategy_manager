@@ -114,15 +114,21 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
             'filters': ['system_log_filter'],
             'class': 'logging.StreamHandler',
             'formatter': 'base',
         },
+        'celery': {
+            'class': 'logging.StreamHandler',
+            'filename': 'celery.log',
+            'formatter': 'base',
+            'filters': ['system_log_filter'],
+        },
     },
     'loggers': {
         '': {
-            'handlers': ['console'],
+            'handlers': ['console', 'celery'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     }
