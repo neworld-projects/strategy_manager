@@ -121,7 +121,7 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'celery'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
