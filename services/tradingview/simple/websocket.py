@@ -56,9 +56,9 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                 )
 
     def check_message(self, result):
-        try:
-            strategy_values = result['p'][1].get('st7')
-            if strategy_values:
+        strategy_values = result['p'][1].get('st7')
+        if strategy_values:
+            if strategy_values['st']:
                 strategy_values = strategy_values['st'][-1]['v']
                 current_state = StateInformation(
                     strategy_values[0],
@@ -71,8 +71,6 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                     self.send_position_data(position_data)
                 self.last_state = current_state
                 logging.info(f"last state {self.last_state.__dict__}")
-        except Exception as e:
-            logging.error(f"{e} {result}")
 
     def on_message(self, ws, message):
         try:
