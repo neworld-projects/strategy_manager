@@ -2,12 +2,21 @@ import os
 
 from celery import Celery
 from celery.schedules import crontab
+from celery.signals import setup_logging
 from django.conf import settings
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chapar.settings')
 
 app = Celery('strategy_manager')
 app.config_from_object('django.conf:settings', namespace='CELERY')
+
+
+@setup_logging.connect
+def config_loggers(*args, **kwargs):
+    from logging.config import dictConfig
+    from django.conf import settings
+    dictConfig(settings.LOGGING)
+
 
 app.autodiscover_tasks()
 
