@@ -15,7 +15,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 @task_failure.connect
 def task_failure_handler(sender=None, exception=None, args=None, **kwargs):
-    logging.info(f'{sender.name} {exception}')
+    logging.info(f'{sender.name}')
 
 
 @setup_logging.connect
