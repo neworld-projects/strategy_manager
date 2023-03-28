@@ -72,8 +72,7 @@ class WebSocketConnectionChartForStrategyManager(OpenWebsocketConnection):
                 self.last_state = current_state
                 logging.info(f"last state {self.last_state.__dict__}")
         except Exception as e:
-            logging.info("has a exception")
-            logging.error(e)
+            logging.error(f"{e} {result}")
 
     def on_message(self, ws, message):
         try:
