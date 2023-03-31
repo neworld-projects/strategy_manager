@@ -2,10 +2,11 @@ from services.binance.send_request import SendRequest as SendRequestBinance
 
 
 class PrepareOpenPosition:
-    def __init__(self, broker_name: str, coin_name: str, telegram_id: str):
+    def __init__(self, broker_name: str, coin_name: str, telegram_id: str, clear: bool = False):
         self.broker_name = broker_name
         self.coin_name = coin_name
         self.telegram_id = telegram_id
+        self.clear = clear
 
     def clear_broker_positions(self):
         if self.broker_name == 'binance':
@@ -39,9 +40,10 @@ class PrepareOpenPosition:
                 return False, "can't change margin"
 
     def prepare_open_position(self, leverage: int, margin_type: str):
-        check, message = self.clear_broker_positions()
-        if not check:
-            return check, message
+        if self.clear:
+            check, message = self.clear_broker_positions()
+            if not check:
+                return check, message
         check, message = self.change_leverage(leverage)
         if not check:
             return check, message

@@ -23,10 +23,14 @@ def send_request_to_broker(
 ):
     logging.info(f"tobe start instance")
     check = False
+    clear = False
+    if position_object.get("open_position_value") and position_object.get("open_position_value") != 0:
+        clear = True
     check_prepare, message = PrepareOpenPosition(
         broker_name,
         coin_name,
-        telegram_id
+        telegram_id,
+        clear
     ).prepare_open_position(
         leverage,
         margin_type
